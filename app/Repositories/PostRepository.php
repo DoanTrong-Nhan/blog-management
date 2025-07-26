@@ -1,8 +1,15 @@
 <?php
 
+
 namespace App\Repositories;
 
 use App\Models\Post;
+use App\Repositories\PostRepositoryInterface;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\DatabaseException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class PostRepository implements PostRepositoryInterface
 {
@@ -13,24 +20,51 @@ class PostRepository implements PostRepositoryInterface
 
     public function find($id)
     {
-        return Post::findOrFail($id);
+        try {
+            return Post::findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            Log::warning("Post not found with ID: {$id}");
+            throw new NotFoundException("Post with ID {$id} not found.");
+        }
     }
 
     public function create(array $data)
     {
-        return Post::create($data);
+        try {
+            return Post::create($data);
+        } catch (Exception $e) {
+            Log::error("Post creation failed: " . $e->getMessage());
+            throw new DatabaseException("Failed to create post.");
+        }
     }
 
     public function update($id, array $data)
     {
-        $post = Post::findOrFail($id);
-        $post->update($data);
-        return $post;
+        try {
+            $post = Post::findOrFail($id);
+            $post->update($data);
+            return $post;
+        } catch (ModelNotFoundException $e) {
+            Log::warning("Post not found when updating. ID: {$id}");
+            throw new NotFoundException("Post with ID {$id} not found.");
+        } catch (Exception $e) {
+            Log::error("Post update failed: " . $e->getMessage());
+            throw new DatabaseException("Failed to update post.");
+        }
     }
 
     public function delete($id)
     {
-        $post = Post::findOrFail($id);
-        return $post->delete();
+        try {
+            $post = Post::findOrFail($id);
+            $post->delete();
+            return true;
+        } catch (ModelNotFoundException $e) {
+            Log::warning("Post not found when deleting. ID: {$id}");
+            throw new NotFoundException("Post with ID {$id} not found.");
+        } catch (Exception $e) {
+            Log::error("Post deletion failed: " . $e->getMessage());
+            throw new DatabaseException("Failed to delete post.");
+        }
     }
 }

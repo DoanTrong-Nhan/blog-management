@@ -34,7 +34,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $this->authService->login($request->validated());
-        return redirect()->intended('/dashboard');
+        return redirect()->intended('/posts');
     }
 
     public function logout()
