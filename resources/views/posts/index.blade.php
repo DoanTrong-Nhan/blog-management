@@ -1,41 +1,45 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>Danh sách bài viết</h2>
-    <a href="{{ route('posts.create') }}" class="btn btn-primary mb-3">Thêm bài viết</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Danh sách bài viết</h2>
+        <a href="{{ route('posts.create') }}" class="btn btn-primary">+ Thêm bài viết</a>
+    </div>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Tiêu đề</th>
-                <th>Thể loại</th>
-                <th>Người viết</th>
-                <th>Thời gian</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($posts as $post)
-                <tr>
-                    <td>{{ $post->title }}</td>
-                    <td>{{ $post->category->name }}</td>
-                    <td>{{ $post->user->name }}</td>
-                    <td>{{ $post->created_at->format('d/m/Y H:i') }}</td>
-                    <td>
-                        <a href="{{ route('posts.show', $post->id) }}" class="btn btn-info btn-sm">Xem</a>
+    <div class="row">
+        @forelse ($posts as $post)
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {{-- Hiển thị ảnh hoặc ảnh mặc định --}}
+                    @php
+                        $imagePath = $post->image 
+                            ? asset('storage/' . $post->image) 
+                            : asset('images/default-image.jpg'); // <-- ảnh mặc định
+                    @endphp
+                    <img src="{{ $imagePath }}" class="card-img-top" alt="{{ $post->title }}" style="height: 200px; object-fit: cover;">
 
-                         @canManagePost($post)
-                        <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-warning btn-sm">Sửa</a>
-                        <form action="{{ route('posts.destroy', $post->id) }}" method="POST" style="display:inline-block;">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('Xoá bài này?')">Xoá</button>
-                        </form>
-                         @endcanManagePost
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="5">Chưa có bài viết.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+                    <div class="card-body d-flex flex-column">
+                        {{-- Title link sang trang chi tiết --}}
+                        <h5 class="card-title">
+                            <a href="{{ route('posts.show', $post->id) }}" class="text-decoration-none text-primary">
+                                {{ Str::limit($post->title, 50) }}
+                            </a>
+                        </h5>
+
+                        <p class="card-text">{{ Str::limit($post->content, 100) }}</p>
+
+                        <div class="mt-auto">
+                            <p class="mb-1"><strong>Thể loại:</strong> {{ $post->category->name }}</p>
+                            <p class="mb-1"><strong>Người viết:</strong> {{ $post->user->name }}</p>
+                            <p class="mb-0 text-muted"><small>Ngày đăng: {{ $post->created_at->format('d/m/Y H:i') }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-12">
+                <div class="alert alert-info">Chưa có bài viết nào.</div>
+            </div>
+        @endforelse
+    </div>
 @endsection

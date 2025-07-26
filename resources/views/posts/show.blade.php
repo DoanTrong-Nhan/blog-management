@@ -1,19 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>{{ $post->title }}</h2>
+    <div class="card shadow-sm">
+        @php
+            $imagePath = $post->image 
+                ? asset('storage/' . $post->image) 
+                : asset('images/default-image.jpg'); // <-- ảnh mặc định
+        @endphp
+        <img src="{{ $imagePath }}" class="card-img-top" style="height: 300px; object-fit: cover;">
 
-    <p><strong>Thể loại:</strong> {{ $post->category->name }}</p>
-    <p><strong>Tác giả:</strong> {{ $post->user->name }}</p>
-    <p><strong>Thời gian:</strong> {{ $post->created_at->format('d/m/Y H:i') }}</p>
+        <div class="card-body">
+            <h3 class="card-title">{{ $post->title }}</h3>
+            <p class="text-muted">
+                Thể loại: {{ $post->category->name }} |
+                Người viết: {{ $post->user->name }} |
+                Ngày đăng: {{ $post->created_at->format('d/m/Y H:i') }}
+            </p>
+            <p class="card-text">{{ $post->content }}</p>
 
-    <div>{!! nl2br(e($post->content)) !!}</div>
-
-    @if ($post->image)
-        <div class="mt-3">
-            <img src="{{ asset('storage/' . $post->image) }}" width="400">
+            @canManagePost($post)
+                <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-warning">Sửa</a>
+                <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-inline">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-danger" onclick="return confirm('Xoá bài viết này?')">Xoá</button>
+                </form>
+            @endcanManagePost
         </div>
-    @endif
-
-    <a href="{{ route('posts.index') }}" class="btn btn-secondary mt-3">Quay lại</a>
+    </div>
 @endsection
