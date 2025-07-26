@@ -19,9 +19,11 @@ class PostController extends Controller
 
     public function index()
     {
-        $posts = $this->service->list();
-        return view('posts.index', compact('posts'));
+        $search = request()->query('search');
+        $posts = $this->service->list(6, $search);
+        return view('posts.index', compact('posts', 'search'));
     }
+
 
     public function create()
     {

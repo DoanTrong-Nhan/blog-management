@@ -5,9 +5,10 @@
         @php
             $imagePath = $post->image 
                 ? asset('storage/' . $post->image) 
-                : asset('images/default-image.jpg'); // <-- ảnh mặc định
+                : asset('storage/images/default-image.jpg'); // <-- ảnh mặc định
         @endphp
-        <img src="{{ $imagePath }}" class="card-img-top" style="height: 300px; object-fit: cover;">
+       <img src="{{ $imagePath }}" class="card-img-top" style="height: 300px; object-fit: contain;">
+
 
         <div class="card-body">
             <h3 class="card-title">{{ $post->title }}</h3>

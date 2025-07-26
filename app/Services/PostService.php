@@ -16,9 +16,9 @@ class PostService implements PostServiceInterface
         $this->repo = $repo;
     }
 
-    public function list()
+    public function list($perPage = 6, $search = null)
     {
-        return $this->repo->getAll();
+        return $this->repo->getPaginated($perPage, $search);
     }
 
     public function find($id)
@@ -63,4 +63,6 @@ class PostService implements PostServiceInterface
         Storage::disk('public')->delete($post->image);
         return $this->repo->delete($id);
     }
+
+
 }

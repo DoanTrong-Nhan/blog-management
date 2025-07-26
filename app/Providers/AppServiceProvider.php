@@ -12,6 +12,7 @@ use App\Services\AuthServiceInterface;
 use App\Services\AuthService;
 use App\Services\PostService;
 use App\Services\PostServiceInterface;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Blade;
@@ -36,10 +37,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-      
+
     Blade::if('canManagePost', function ($post) {
          $user = Auth::user();
         return $user && ($user->role->name === 'admin' || $user->id === $post->user_id);
     });
+
+     Paginator::useBootstrap(); // hoặc useBootstrapFive()
     }
 }

@@ -67,4 +67,19 @@ class PostRepository implements PostRepositoryInterface
             throw new DatabaseException("Failed to delete post.");
         }
     }
+
+
+        // PostRepository.php
+    public function getPaginated($perPage = 6, $search = null)
+    {
+        $query = Post::with(['category', 'user'])->latest();
+
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('content', 'like', "%{$search}%");
+        }
+
+        return $query->paginate($perPage);
+    }
+
 }
